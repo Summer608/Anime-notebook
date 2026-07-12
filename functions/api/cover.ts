@@ -64,6 +64,9 @@ export const onRequest: PagesFunction<Env> = async (context) => {
     });
 
     if (!fetchResponse.ok) {
+      if (fetchResponse.status === 403 || fetchResponse.status === 401) {
+        return Response.redirect(targetUrl, 302);
+      }
       return new Response(`Failed to fetch: ${fetchResponse.status}`, { status: 502 });
     }
 

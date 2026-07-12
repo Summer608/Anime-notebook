@@ -720,7 +720,7 @@ export async function fetchCoverImage(query: string): Promise<string | undefined
     return s.images.large || s.images.common || s.images.medium || s.images.small;
   };
 
-  // 1. Bangumi 优先（中文动漫数据库，中文搜索最准确）
+  // 1. Bangumi 优先（中文动漫数据库，中文搜索最准确，图片不被 403）
   const bangumi = await searchBangumi(searchName);
   const cover = pickBangumiCover(bangumi);
   if (cover) {
@@ -730,19 +730,19 @@ export async function fetchCoverImage(query: string): Promise<string | undefined
     return cover;
   }
 
-  // 2. AniList（补充）
-  const anilistCover = await searchAniList(searchName);
-  if (anilistCover) {
-    console.log(`[封面结果] "${trimmed}" → AniList`);
-    return anilistCover;
-  }
-
-  // 3. Jikan / MAL（最后备用，已添加相关性验证）
+  // 2. Jikan / MAL（服务器抓取不易被 403）
   const jikan = await searchJikan(searchName);
   if (jikan) {
     const url = jikan.images.jpg.large_image_url || jikan.images.jpg.image_url;
     console.log(`[封面结果] "${trimmed}" → Jikan: ${jikan.title}`);
     return url;
+  }
+
+  // 3. AniList（最后备用，服务器抓取容易被 403）
+  const anilistCover = await searchAniList(searchName);
+  if (anilistCover) {
+    console.log(`[封面结果] "${trimmed}" → AniList`);
+    return anilistCover;
   }
 
   console.log(`[封面结果] "${trimmed}" → 未找到`);

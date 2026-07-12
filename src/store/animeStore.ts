@@ -133,12 +133,7 @@ export const useAnimeStore = create<AnimeState>()(
         };
         set((state) => ({ items: [newItem, ...state.items] }));
         if (canWriteCloud()) {
-          supabase
-            .from("anime_items")
-            .insert(itemToRow(newItem))
-            .then(({ error }) => {
-              if (error) console.error("Supabase insert error:", error);
-            });
+          syncOrderToCloud(get().items);
         }
       },
 
@@ -152,13 +147,7 @@ export const useAnimeStore = create<AnimeState>()(
         }));
         set((state) => ({ items: [...newItems, ...state.items] }));
         if (canWriteCloud()) {
-          const rows = newItems.map((item) => itemToRow(item));
-          supabase
-            .from("anime_items")
-            .insert(rows)
-            .then(({ error }) => {
-              if (error) console.error("Supabase insert error:", error);
-            });
+          syncOrderToCloud(get().items);
         }
       },
 
@@ -320,20 +309,24 @@ export const useAnimeStore = create<AnimeState>()(
         try {
           const result = await Promise.race([
             supabase.from("anime_items").select("*").order("sort_order", { ascending: true }),
-            new Promise<null>((resolve) => setTimeout(() => resolve(null), 8000)),
+            new Promise<"timeout">((resolve) => setTimeout(() => resolve("timeout"), 8000)),
           ]);
-          if (!result || !("data" in result)) return 0;
+          if (result === "timeout") {
+            console.warn("Supabase load timeout, using local data");
+            return -1;
+          }
+          if (!result || !("data" in result)) return -1;
           const { data, error } = result;
           if (error) {
             console.error("Supabase load error:", error);
-            return 0;
+            return -1;
           }
           if (!data || data.length === 0) return 0;
           const items = data.map(rowToItem);
           set({ items, sortBy: "manual" });
           return items.length;
         } catch {
-          return 0;
+          return -1;
         } finally {
           set({ isLoadingCloud: false });
         }

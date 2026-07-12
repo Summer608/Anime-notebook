@@ -30,6 +30,8 @@ export default function App() {
         if (migrated > 0) {
           console.log(`已迁移 ${migrated} 条数据到云端`);
         }
+      } else if (loaded === -1) {
+        console.warn("云端加载失败，使用本地数据，不触发迁移");
       }
     })();
     return () => {

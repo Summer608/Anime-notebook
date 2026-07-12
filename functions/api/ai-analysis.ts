@@ -55,7 +55,10 @@ export const onRequest: PagesFunction<Env> = async (context) => {
   const { request, env } = context;
 
   if (!env.DOUBAO_API_KEY) {
-    return new Response("DOUBAO_API_KEY not configured", { status: 500 });
+    return new Response(JSON.stringify({ error: "DOUBAO_API_KEY not configured" }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 
   const url = new URL(request.url);
@@ -112,47 +115,59 @@ export const onRequest: PagesFunction<Env> = async (context) => {
 
     const reader = apiResponse.body!.getReader();
     const decoder = new TextDecoder();
+    const encoder = new TextEncoder();
     let buffer = "";
     let fullContent = "";
 
     const stream = new ReadableStream({
-      async pull(controller) {
+      async start(controller) {
         try {
-          const { done, value } = await reader.read();
-          if (done) {
-            controller.close();
-            if (fullContent.length > 0) {
-              await env.COVERS.put(cacheKey, fullContent);
-            }
-            return;
-          }
+          while (true) {
+            const { done, value } = await reader.read();
 
-          buffer += decoder.decode(value, { stream: true });
-          const lines = buffer.split("\n");
-          buffer = lines.pop() ?? "";
-
-          for (const line of lines) {
-            const trimmed = line.trim();
-            if (!trimmed || !trimmed.startsWith("data:")) continue;
-
-            const data = trimmed.slice(5).trim();
-            if (data === "[DONE]") {
-              controller.close();
+            if (done) {
               if (fullContent.length > 0) {
-                await env.COVERS.put(cacheKey, fullContent);
+                try {
+                  await env.COVERS.put(cacheKey, fullContent);
+                } catch {
+                  // 缓存写入失败不影响返回
+                }
               }
+              controller.close();
               return;
             }
 
-            try {
-              const parsed: DoubaoChunk = JSON.parse(data);
-              const delta = parsed.choices?.[0]?.delta?.content;
-              if (delta) {
-                fullContent += delta;
-                controller.enqueue(new TextEncoder().encode(delta));
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split("\n");
+            buffer = lines.pop() ?? "";
+
+            for (const line of lines) {
+              const trimmed = line.trim();
+              if (!trimmed || !trimmed.startsWith("data:")) continue;
+
+              const data = trimmed.slice(5).trim();
+              if (data === "[DONE]") {
+                if (fullContent.length > 0) {
+                  try {
+                    await env.COVERS.put(cacheKey, fullContent);
+                  } catch {
+                    // 缓存写入失败不影响返回
+                  }
+                }
+                controller.close();
+                return;
               }
-            } catch {
-              // 跳过无法解析的行
+
+              try {
+                const parsed: DoubaoChunk = JSON.parse(data);
+                const delta = parsed.choices?.[0]?.delta?.content;
+                if (delta) {
+                  fullContent += delta;
+                  controller.enqueue(encoder.encode(delta));
+                }
+              } catch {
+                // 跳过无法解析的行
+              }
             }
           }
         } catch (err) {

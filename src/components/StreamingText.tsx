@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 
 interface StreamingTextProps {
   stream: ReadableStream<Uint8Array> | null;
@@ -85,7 +85,18 @@ function renderInline(text: string): React.ReactNode {
 export function StreamingText({ stream, onDone }: StreamingTextProps) {
   const [text, setText] = useState("");
   const [done, setDone] = useState(false);
+  const [error, setError] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const onDoneRef = useRef(onDone);
+
+  useEffect(() => {
+    onDoneRef.current = onDone;
+  }, [onDone]);
+
+  const finish = useCallback(() => {
+    setDone(true);
+    onDoneRef.current();
+  }, []);
 
   useEffect(() => {
     if (!stream) return;
@@ -93,21 +104,34 @@ export function StreamingText({ stream, onDone }: StreamingTextProps) {
     let cancelled = false;
     const reader = stream.getReader();
     const decoder = new TextDecoder();
+    let receivedAny = false;
+
+    const timeoutId = setTimeout(() => {
+      if (!receivedAny && !cancelled) {
+        setError(true);
+        try { reader.cancel(); } catch { /* noop */ }
+        finish();
+      }
+    }, 30000);
 
     const read = async () => {
       while (!cancelled) {
         try {
           const { done: readerDone, value } = await reader.read();
           if (readerDone) break;
+          receivedAny = true;
           const chunk = decoder.decode(value, { stream: true });
           setText((prev) => prev + chunk);
         } catch {
+          if (!cancelled) {
+            setError(true);
+          }
           break;
         }
       }
+      clearTimeout(timeoutId);
       if (!cancelled) {
-        setDone(true);
-        onDone();
+        finish();
       }
     };
 
@@ -115,9 +139,10 @@ export function StreamingText({ stream, onDone }: StreamingTextProps) {
 
     return () => {
       cancelled = true;
-      reader.cancel();
+      clearTimeout(timeoutId);
+      try { reader.cancel(); } catch { /* noop */ }
     };
-  }, [stream, onDone]);
+  }, [stream, finish]);
 
   useEffect(() => {
     if (containerRef.current) {
@@ -132,6 +157,12 @@ export function StreamingText({ stream, onDone }: StreamingTextProps) {
       ref={containerRef}
       className="max-h-[50vh] space-y-3 overflow-y-auto rounded-2xl bg-white/60 p-5 text-sm leading-relaxed text-ink/80 md:max-h-[60vh]"
     >
+      {error && text.length === 0 && (
+        <p className="text-center text-coral">
+          AI 响应超时或出错，请点击"重新分析"重试。
+        </p>
+      )}
+
       {blocks.map((block, i) => {
         switch (block.type) {
           case "h2":
@@ -150,8 +181,8 @@ export function StreamingText({ stream, onDone }: StreamingTextProps) {
             return (
               <blockquote
                 key={i}
-                className="border-l-3 border-coral/40 bg-coral/5 py-2 pl-3 text-xs italic text-stone"
-                style={{ borderLeftWidth: "3px" }}
+                className="bg-coral/5 py-2 pl-3 text-xs italic text-stone"
+                style={{ borderLeft: "3px solid rgba(255,107,107,0.4)" }}
               >
                 {renderInline(block.content)}
               </blockquote>
@@ -176,7 +207,7 @@ export function StreamingText({ stream, onDone }: StreamingTextProps) {
         }
       })}
 
-      {!done && (
+      {!done && !error && (
         <span className="inline-block h-4 w-2 animate-pulse bg-coral" />
       )}
     </div>

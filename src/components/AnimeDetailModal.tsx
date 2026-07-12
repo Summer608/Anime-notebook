@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { X, Sparkles, RefreshCw, Loader2, ExternalLink } from "lucide-react";
 import type { AnimeItem } from "@/types";
 import { GenreTag } from "./GenreTag";
@@ -21,9 +21,14 @@ export function AnimeDetailModal({ anime, isOpen, onClose }: AnimeDetailModalPro
   const [streamDone, setStreamDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const abortRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
     if (!isOpen) {
+      if (abortRef.current) {
+        abortRef.current.abort();
+        abortRef.current = null;
+      }
       setStream(null);
       setLoading(false);
       setStreamDone(false);
@@ -45,19 +50,32 @@ export function AnimeDetailModal({ anime, isOpen, onClose }: AnimeDetailModalPro
     };
   }, [isOpen, onClose]);
 
+  const handleStreamDone = useCallback(() => {
+    setStreamDone(true);
+  }, []);
+
   if (!isOpen || !anime) return null;
 
   const handleAnalyze = async (force = false) => {
+    if (abortRef.current) {
+      abortRef.current.abort();
+    }
+
     setLoading(true);
     setStreamDone(false);
     setError(null);
     setStream(null);
 
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       const params = new URLSearchParams({ name: anime.displayName });
       if (force) params.set("force", "1");
 
-      const response = await fetch(`/api/ai-analysis?${params}`);
+      const response = await fetch(`/api/ai-analysis?${params}`, {
+        signal: controller.signal,
+      });
 
       if (!response.ok) {
         const errText = await response.text();
@@ -71,13 +89,10 @@ export function AnimeDetailModal({ anime, isOpen, onClose }: AnimeDetailModalPro
         setLoading(false);
       }
     } catch (err) {
+      if ((err as Error).name === "AbortError") return;
       setError(`网络错误：${(err as Error).message}`);
       setLoading(false);
     }
-  };
-
-  const handleStreamDone = () => {
-    setStreamDone(true);
   };
 
   return (

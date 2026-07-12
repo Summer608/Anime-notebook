@@ -32,6 +32,11 @@ function getInitials(name: string): string {
   return name.charAt(0).toUpperCase();
 }
 
+function getCoverSrc(coverUrl: string): string {
+  if (import.meta.env.DEV) return coverUrl;
+  return `/api/cover?url=${encodeURIComponent(coverUrl)}`;
+}
+
 export function AnimeCard({ anime, onDelete, style }: AnimeCardProps) {
   const gradient = getGradient(anime.displayName);
   const initials = getInitials(anime.displayName);
@@ -44,7 +49,7 @@ export function AnimeCard({ anime, onDelete, style }: AnimeCardProps) {
       <div className="relative aspect-[3/4] overflow-hidden rounded-2xl">
         {anime.coverUrl ? (
           <img
-            src={anime.coverUrl}
+            src={getCoverSrc(anime.coverUrl)}
             alt={anime.displayName}
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
             loading="lazy"

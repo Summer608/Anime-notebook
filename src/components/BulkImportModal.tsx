@@ -240,7 +240,7 @@ export function BulkImportModal({ isOpen, onClose, onAddItems }: BulkImportModal
                     <div className="h-16 w-12 shrink-0 overflow-hidden rounded-lg bg-ink/5">
                       {candidate.coverUrl ? (
                         <img
-                          src={candidate.coverUrl}
+                          src={import.meta.env.DEV ? candidate.coverUrl : `/api/cover?url=${encodeURIComponent(candidate.coverUrl)}`}
                           alt={candidate.displayName}
                           className="h-full w-full object-cover"
                           loading="lazy"

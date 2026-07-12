@@ -44,7 +44,7 @@ export function AnimeCard({ anime, onDelete, style }: AnimeCardProps) {
   return (
     <article
       style={style}
-      className="card group relative flex flex-col gap-4 overflow-hidden hover:-translate-y-1 hover:shadow-lift"
+      className="card group relative flex flex-col gap-2 overflow-hidden p-3 hover:-translate-y-1 hover:shadow-lift sm:gap-4 sm:p-5"
     >
       <div className="relative aspect-[3/4] overflow-hidden rounded-2xl">
         {anime.coverUrl ? (
@@ -66,9 +66,9 @@ export function AnimeCard({ anime, onDelete, style }: AnimeCardProps) {
         <div className="absolute inset-0 bg-gradient-to-t from-ink/40 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
       </div>
 
-      <div className="flex flex-1 flex-col gap-3">
+      <div className="flex flex-1 flex-col gap-1.5 sm:gap-3">
         <h3
-          className="group/link relative text-lg font-bold leading-tight text-ink"
+          className="group/link relative text-xs font-bold leading-tight text-ink sm:text-lg"
           title={anime.displayName}
         >
           <span className="line-clamp-2">{anime.displayName}</span>

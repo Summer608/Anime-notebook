@@ -268,7 +268,7 @@ export const useAnimeStore = create<AnimeState>()(
 
         if (canWriteCloud()) {
           const items = get().items;
-          const rows = items.map((item) => itemToRow(item));
+          const rows = items.map((item, index) => itemToRow(item, index));
           supabase
             .from("anime_items")
             .upsert(rows)
@@ -303,7 +303,7 @@ export const useAnimeStore = create<AnimeState>()(
                     .in("id", toDelete);
                   if (delError) console.error("Supabase delete error:", delError);
                 }
-                const rows = parsed.map((item) => itemToRow(item));
+                const rows = parsed.map((item, index) => itemToRow(item, index));
                 const { error } = await supabase.from("anime_items").upsert(rows);
                 if (error) console.error("Supabase import error:", error);
               })();

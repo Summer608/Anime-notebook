@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 
 interface StreamingTextProps {
   stream: ReadableStream<Uint8Array> | null;
@@ -88,18 +88,22 @@ export function StreamingText({ stream, onDone }: StreamingTextProps) {
   const [error, setError] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const onDoneRef = useRef(onDone);
+  const finishedRef = useRef(false);
 
   useEffect(() => {
     onDoneRef.current = onDone;
   }, [onDone]);
 
   const finish = useCallback(() => {
+    if (finishedRef.current) return;
+    finishedRef.current = true;
     setDone(true);
     onDoneRef.current();
   }, []);
 
   useEffect(() => {
     if (!stream) return;
+    finishedRef.current = false;
 
     let cancelled = false;
     const reader = stream.getReader();
@@ -150,7 +154,14 @@ export function StreamingText({ stream, onDone }: StreamingTextProps) {
     }
   }, [text]);
 
-  const blocks = parseMarkdown(text);
+  const blocks = useMemo(() => {
+    try {
+      return parseMarkdown(text);
+    } catch (err) {
+      console.error("[parseMarkdown error]", err);
+      return [{ type: "paragraph" as const, content: text }];
+    }
+  }, [text]);
 
   return (
     <div
@@ -164,46 +175,55 @@ export function StreamingText({ stream, onDone }: StreamingTextProps) {
       )}
 
       {blocks.map((block, i) => {
-        switch (block.type) {
-          case "h2":
-            return (
-              <h2 key={i} className="border-b border-ink/10 pb-2 font-display text-lg font-bold text-ink">
-                {block.content}
-              </h2>
-            );
-          case "h3":
-            return (
-              <h3 key={i} className="font-display text-base font-bold text-ink">
-                {block.content}
-              </h3>
-            );
-          case "quote":
-            return (
-              <blockquote
-                key={i}
-                className="bg-coral/5 py-2 pl-3 text-xs italic text-stone"
-                style={{ borderLeft: "3px solid rgba(255,107,107,0.4)" }}
-              >
-                {renderInline(block.content)}
-              </blockquote>
-            );
-          case "list":
-            return (
-              <ul key={i} className="space-y-1.5">
-                {block.items!.map((item, j) => (
-                  <li key={j} className="flex gap-2">
-                    <span className="mt-0.5 text-coral">•</span>
-                    <span>{renderInline(item)}</span>
-                  </li>
-                ))}
-              </ul>
-            );
-          default:
-            return (
-              <p key={i} className="text-sm">
-                {renderInline(block.content)}
-              </p>
-            );
+        try {
+          switch (block.type) {
+            case "h2":
+              return (
+                <h2 key={i} className="border-b border-ink/10 pb-2 font-display text-lg font-bold text-ink">
+                  {block.content}
+                </h2>
+              );
+            case "h3":
+              return (
+                <h3 key={i} className="font-display text-base font-bold text-ink">
+                  {block.content}
+                </h3>
+              );
+            case "quote":
+              return (
+                <blockquote
+                  key={i}
+                  className="bg-coral/5 py-2 pl-3 text-xs italic text-stone"
+                  style={{ borderLeft: "3px solid rgba(255,107,107,0.4)" }}
+                >
+                  {renderInline(block.content)}
+                </blockquote>
+              );
+            case "list":
+              return (
+                <ul key={i} className="space-y-1.5">
+                  {(block.items ?? []).map((item, j) => (
+                    <li key={j} className="flex gap-2">
+                      <span className="mt-0.5 text-coral">•</span>
+                      <span>{renderInline(item)}</span>
+                    </li>
+                  ))}
+                </ul>
+              );
+            default:
+              return (
+                <p key={i} className="text-sm">
+                  {renderInline(block.content)}
+                </p>
+              );
+          }
+        } catch (err) {
+          console.error("[renderBlock error]", err, block);
+          return (
+            <p key={i} className="text-sm text-stone">
+              {block.content}
+            </p>
+          );
         }
       })}
 

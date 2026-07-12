@@ -3,6 +3,7 @@ import { X, Sparkles, RefreshCw, Loader2, ExternalLink } from "lucide-react";
 import type { AnimeItem } from "@/types";
 import { GenreTag } from "./GenreTag";
 import { StreamingText } from "./StreamingText";
+import { ErrorBoundary } from "./ErrorBoundary";
 
 interface AnimeDetailModalProps {
   anime: AnimeItem | null;
@@ -194,7 +195,9 @@ export function AnimeDetailModal({ anime, isOpen, onClose }: AnimeDetailModalPro
 
             {stream && (
               <div className="space-y-4">
-                <StreamingText stream={stream} onDone={handleStreamDone} />
+                <ErrorBoundary>
+                  <StreamingText stream={stream} onDone={handleStreamDone} />
+                </ErrorBoundary>
                 {streamDone && (
                   <div className="flex justify-end pt-2">
                     <button

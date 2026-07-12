@@ -9,6 +9,7 @@ import { Footer } from "@/components/Footer";
 import { AddAnimeModal } from "@/components/AddAnimeModal";
 import { BulkImportModal } from "@/components/BulkImportModal";
 import { FloatingAddButton } from "@/components/FloatingAddButton";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { useAnimeStore, isSupabaseConfigured } from "@/store/animeStore";
 import { useAuthStore } from "@/store/authStore";
 
@@ -62,6 +63,7 @@ export default function App() {
 
   return (
     <Router>
+      <ErrorBoundary>
       <div className="flex min-h-screen flex-col">
         <Header
           onAddClick={handleAddClick}
@@ -101,6 +103,7 @@ export default function App() {
           onAddItems={addItems}
         />
       </div>
+      </ErrorBoundary>
     </Router>
   );
 }

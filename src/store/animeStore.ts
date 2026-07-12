@@ -318,10 +318,12 @@ export const useAnimeStore = create<AnimeState>()(
         if (!isSupabaseConfigured) return 0;
         set({ isLoadingCloud: true });
         try {
-          const { data, error } = await supabase
-            .from("anime_items")
-            .select("*")
-            .order("sort_order", { ascending: true });
+          const result = await Promise.race([
+            supabase.from("anime_items").select("*").order("sort_order", { ascending: true }),
+            new Promise<null>((resolve) => setTimeout(() => resolve(null), 8000)),
+          ]);
+          if (!result || !("data" in result)) return 0;
+          const { data, error } = result;
           if (error) {
             console.error("Supabase load error:", error);
             return 0;
@@ -330,6 +332,8 @@ export const useAnimeStore = create<AnimeState>()(
           const items = data.map(rowToItem);
           set({ items, sortBy: "manual" });
           return items.length;
+        } catch {
+          return 0;
         } finally {
           set({ isLoadingCloud: false });
         }

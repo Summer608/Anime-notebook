@@ -26,7 +26,7 @@ export function Hero({ totalCount, onAddClick, onBulkImportClick }: HeroProps) {
         </h1>
 
         <p className="mx-auto mb-8 max-w-xl text-base leading-relaxed text-white/75 sm:text-lg">
-          收集你看过的日本动漫，自动补全名称、归类题材，一键直达豆瓣评分页。
+          收集你看过的日本动漫，自动补全名称、归类题材。
           让每一份观影记忆都有迹可循。
         </p>
 

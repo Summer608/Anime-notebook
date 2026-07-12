@@ -241,7 +241,7 @@ export const animeKnowledgeBase: AnimeKnowledge[] = [
   },
   {
     aliases: ["未闻花名", "面码"],
-    fullName: "我们仍未知道那天所看见的花名。 / あの日見た花の名前を僕達はまだ知らない。",
+    fullName: "我们仍未知道那天所看见的花的名字。 / あの日見た花の名前を僕達はまだ知らない。",
     genres: ["治愈", "恋爱", "校园", "日常", "奇幻"],
   },
   {

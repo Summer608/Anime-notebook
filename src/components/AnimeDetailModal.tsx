@@ -21,7 +21,6 @@ export function AnimeDetailModal({ anime, isOpen, onClose }: AnimeDetailModalPro
   const [loading, setLoading] = useState(false);
   const [streamDone, setStreamDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const scrollRef = useRef<HTMLDivElement>(null);
   const abortRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
@@ -116,8 +115,8 @@ export function AnimeDetailModal({ anime, isOpen, onClose }: AnimeDetailModalPro
           <X className="h-5 w-5" />
         </button>
 
-        <div className="flex flex-col overflow-hidden md:flex-row">
-          <div className="flex flex-col gap-3 border-b border-ink/10 p-5 md:w-1/3 md:border-b-0 md:border-r">
+        <div className="flex flex-col overflow-y-auto md:flex-row md:overflow-hidden">
+          <div className="flex flex-col gap-3 border-b border-ink/10 p-5 md:w-1/3 md:shrink-0 md:overflow-y-auto md:border-b-0 md:border-r">
             {anime.coverUrl && (
               <div className="mx-auto aspect-[3/4] w-full max-w-[200px] overflow-hidden rounded-2xl shadow-soft md:max-w-[240px]">
                 <img
@@ -153,9 +152,9 @@ export function AnimeDetailModal({ anime, isOpen, onClose }: AnimeDetailModalPro
             </div>
           </div>
 
-          <div ref={scrollRef} className="flex-1 overflow-y-auto p-5">
+          <div className="flex-1 p-5 md:overflow-y-auto">
             {!stream && !loading && !error && (
-              <div className="flex h-full flex-col items-center justify-center gap-4 py-12">
+              <div className="flex min-h-[40vh] flex-col items-center justify-center gap-4 py-12 md:h-full">
                 <div className="rounded-full bg-coral/10 p-4">
                   <Sparkles className="h-8 w-8 text-coral" />
                 </div>
@@ -174,14 +173,14 @@ export function AnimeDetailModal({ anime, isOpen, onClose }: AnimeDetailModalPro
             )}
 
             {loading && (
-              <div className="flex h-full flex-col items-center justify-center gap-3 py-12">
+              <div className="flex min-h-[40vh] flex-col items-center justify-center gap-3 py-12 md:h-full">
                 <Loader2 className="h-8 w-8 animate-spin text-coral" />
                 <p className="text-sm text-stone">正在召唤 AI...</p>
               </div>
             )}
 
             {error && (
-              <div className="flex h-full flex-col items-center justify-center gap-4 py-12">
+              <div className="flex min-h-[40vh] flex-col items-center justify-center gap-4 py-12 md:h-full">
                 <p className="text-center text-sm text-coral">{error}</p>
                 <button
                   type="button"

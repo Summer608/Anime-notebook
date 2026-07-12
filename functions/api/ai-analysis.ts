@@ -19,21 +19,23 @@ function buildPrompt(animeName: string): string {
 ## 📊 评分一览
 - **豆瓣评分**：X.X / 10
 - **Bangumi 评分**：X.X / 10
-> 如不确定具体数字，给出合理估值并标注"约"
+> ⚠️ 评分准确性最重要！请务必检索真实的豆瓣(douban.com)和Bangumi(bgm.tv)评分数据，切勿编造。如确实无法检索到，标注"暂无"。
 
-## 📺 各集标题
-- 第1集：标题
-- 第2集：标题
-...（列出全部或主要集数）
-
-## 💬 经典台词与名场面
+##  经典台词与名场面
 1. "台词原文" —— 场景描述
 2. "台词原文" —— 场景描述
-...（3-5 条）
+...（3-5 条，确保台词准确出自该作品）
 
 ## 🎯 入坑指南 & 相似作品
 **看前须知**：...
-**相似作品**：《作品1》《作品2》《作品3》
+**相似作品**：
+- 《作品1》
+- 《作品2》
+- 《作品3》
+- 《作品4》
+- 《作品5》
+- 《作品6》
+...（列举6-8部高度相似的作品，确保题材、风格或受众相似，切勿凑数）
 
 ## ✨ 一句话灵魂总结
 xxx
@@ -41,7 +43,7 @@ xxx
 ## 🔍 冷知识与幕后花絮
 1. xxx
 2. xxx
-...（3-5 条）`;
+...（3-5 条，确保信息准确真实）`;
 }
 
 interface DoubaoChunk {
@@ -96,7 +98,7 @@ export const onRequest: PagesFunction<Env> = async (context) => {
         body: JSON.stringify({
           model: "doubao-seed-2-0-mini-260428",
           messages: [
-            { role: "system", content: "你是一位资深动漫评论家，知识渊博，文笔生动。" },
+            { role: "system", content: "你是一位资深动漫评论家，知识渊博，文笔生动。你提供的所有信息必须准确无误，尤其是评分数据必须来自真实检索结果，绝不能编造。" },
             { role: "user", content: buildPrompt(animeName) },
           ],
           stream: true,

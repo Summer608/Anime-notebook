@@ -8,6 +8,7 @@ interface AnimeGridProps {
   items: AnimeItem[];
   onDelete?: (id: string) => void;
   onReorder?: (sourceId: string, targetId: string) => void;
+  onAnimeClick?: (anime: AnimeItem) => void;
   viewMode?: ViewMode;
 }
 
@@ -15,6 +16,7 @@ export function AnimeGrid({
   items,
   onDelete,
   onReorder,
+  onAnimeClick,
   viewMode = "card",
 }: AnimeGridProps) {
   const [draggedId, setDraggedId] = useState<string | null>(null);
@@ -75,13 +77,14 @@ export function AnimeGrid({
             return (
               <li
                 {...itemProps(anime)}
+                onClick={() => onAnimeClick?.(anime)}
                 className={`group flex items-center gap-3 border-l-2 px-4 py-3 transition-all ${
                   isDragging
                     ? "opacity-40"
                     : isDragOver
                       ? "border-coral bg-coral/10"
                       : "border-transparent hover:bg-coral/5"
-                }`}
+                } ${onAnimeClick ? "cursor-pointer" : ""}`}
               >
                 <span className="w-8 shrink-0 text-center text-sm font-medium text-stone">
                   {index + 1}
@@ -108,7 +111,10 @@ export function AnimeGrid({
                 {onDelete && (
                   <button
                     type="button"
-                    onClick={() => onDelete(anime.id)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDelete(anime.id);
+                    }}
                     className="rounded-full p-1.5 text-stone opacity-0 transition-all hover:bg-coral hover:text-white group-hover:opacity-100"
                     aria-label="删除"
                   >
@@ -146,7 +152,7 @@ export function AnimeGrid({
                     : ""
               }`}
             >
-              <AnimeCard anime={anime} onDelete={onDelete} />
+              <AnimeCard anime={anime} onDelete={onDelete} onClick={onAnimeClick} />
             </div>
           </div>
         );

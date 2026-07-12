@@ -6,9 +6,10 @@ import { AnimeCard } from "./AnimeCard";
 interface CategoriesViewProps {
   items: AnimeItem[];
   onDelete?: (id: string) => void;
+  onAnimeClick?: (anime: AnimeItem) => void;
 }
 
-export function CategoriesView({ items, onDelete }: CategoriesViewProps) {
+export function CategoriesView({ items, onDelete, onAnimeClick }: CategoriesViewProps) {
   const grouped = items.reduce<Record<string, AnimeItem[]>>((acc, item) => {
     item.genres.forEach((genre) => {
       if (!acc[genre]) acc[genre] = [];
@@ -67,7 +68,7 @@ export function CategoriesView({ items, onDelete }: CategoriesViewProps) {
           {expanded[genre] && (
             <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
               {grouped[genre].map((anime) => (
-                <AnimeCard key={anime.id} anime={anime} onDelete={onDelete} />
+                <AnimeCard key={anime.id} anime={anime} onDelete={onDelete} onClick={onAnimeClick} />
               ))}
             </div>
           )}

@@ -5,8 +5,10 @@ import { FilterBar } from "@/components/FilterBar";
 import { AnimeGrid } from "@/components/AnimeGrid";
 import { BackupTools } from "@/components/BackupTools";
 import { FetchCoversButton } from "@/components/FetchCoversButton";
+import { AnimeDetailModal } from "@/components/AnimeDetailModal";
 import { useAnimeStore, filterAndSortItems, getAllGenres } from "@/store/animeStore";
 import { useAuthStore } from "@/store/authStore";
+import type { AnimeItem } from "@/types";
 
 interface HomeProps {
   onAddClick: () => void;
@@ -15,6 +17,7 @@ interface HomeProps {
 
 export default function Home({ onAddClick, onBulkImportClick }: HomeProps) {
   const [syncResult, setSyncResult] = useState<string | null>(null);
+  const [selectedAnime, setSelectedAnime] = useState<AnimeItem | null>(null);
 
   const {
     items,
@@ -125,7 +128,14 @@ export default function Home({ onAddClick, onBulkImportClick }: HomeProps) {
         items={filteredItems}
         onDelete={user ? removeItem : undefined}
         onReorder={user ? handleReorder : undefined}
+        onAnimeClick={setSelectedAnime}
         viewMode={viewMode}
+      />
+
+      <AnimeDetailModal
+        anime={selectedAnime}
+        isOpen={selectedAnime !== null}
+        onClose={() => setSelectedAnime(null)}
       />
     </div>
   );

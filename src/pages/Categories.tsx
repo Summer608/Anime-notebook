@@ -1,10 +1,14 @@
+import { useState } from "react";
 import { CategoriesView } from "@/components/CategoriesView";
+import { AnimeDetailModal } from "@/components/AnimeDetailModal";
 import { useAnimeStore } from "@/store/animeStore";
 import { useAuthStore } from "@/store/authStore";
+import type { AnimeItem } from "@/types";
 
 export default function Categories() {
   const { items, removeItem } = useAnimeStore();
   const { user } = useAuthStore();
+  const [selectedAnime, setSelectedAnime] = useState<AnimeItem | null>(null);
 
   return (
     <div className="space-y-6 pb-8">
@@ -15,7 +19,17 @@ export default function Categories() {
         </p>
       </div>
 
-      <CategoriesView items={items} onDelete={user ? removeItem : undefined} />
+      <CategoriesView
+        items={items}
+        onDelete={user ? removeItem : undefined}
+        onAnimeClick={setSelectedAnime}
+      />
+
+      <AnimeDetailModal
+        anime={selectedAnime}
+        isOpen={selectedAnime !== null}
+        onClose={() => setSelectedAnime(null)}
+      />
     </div>
   );
 }

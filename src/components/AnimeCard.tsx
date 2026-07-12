@@ -5,6 +5,7 @@ import { GenreTag } from "./GenreTag";
 interface AnimeCardProps {
   anime: AnimeItem;
   onDelete?: (id: string) => void;
+  onClick?: (anime: AnimeItem) => void;
   style?: React.CSSProperties;
 }
 
@@ -37,14 +38,15 @@ function getCoverSrc(coverUrl: string): string {
   return `/api/cover?url=${encodeURIComponent(coverUrl)}`;
 }
 
-export function AnimeCard({ anime, onDelete, style }: AnimeCardProps) {
+export function AnimeCard({ anime, onDelete, onClick, style }: AnimeCardProps) {
   const gradient = getGradient(anime.displayName);
   const initials = getInitials(anime.displayName);
 
   return (
     <article
       style={style}
-      className="card group relative flex flex-col gap-2 overflow-hidden p-3 hover:-translate-y-1 hover:shadow-lift sm:gap-4 sm:p-5"
+      onClick={() => onClick?.(anime)}
+      className={`card group relative flex flex-col gap-2 overflow-hidden p-3 hover:-translate-y-1 hover:shadow-lift sm:gap-4 sm:p-5 ${onClick ? "cursor-pointer" : ""}`}
     >
       <div className="relative aspect-[3/4] overflow-hidden rounded-2xl">
         {anime.coverUrl ? (
@@ -87,7 +89,10 @@ export function AnimeCard({ anime, onDelete, style }: AnimeCardProps) {
       {onDelete && (
         <button
           type="button"
-          onClick={() => onDelete(anime.id)}
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete(anime.id);
+          }}
           className="absolute right-4 top-4 rounded-full bg-white/80 p-2 text-stone opacity-0 backdrop-blur-sm transition-all hover:bg-coral hover:text-white group-hover:opacity-100"
           aria-label="删除"
         >

@@ -55,7 +55,11 @@ export const onRequest: PagesFunction<Env> = async (context) => {
 
   try {
     const fetchResponse = await fetch(targetUrl, {
-      headers: { "User-Agent": "AnimeNotebook/1.0" },
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept": "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
+        "Referer": "https://anilist.co/",
+      },
       signal: AbortSignal.timeout(15000),
     });
 
@@ -65,6 +69,10 @@ export const onRequest: PagesFunction<Env> = async (context) => {
 
     const contentType = fetchResponse.headers.get("Content-Type") ?? getContentType(targetUrl);
     const body = await fetchResponse.arrayBuffer();
+
+    if (body.byteLength === 0) {
+      return new Response("Empty image body", { status: 502 });
+    }
 
     await env.COVERS.put(key, body, {
       httpMetadata: { contentType },

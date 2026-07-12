@@ -23,8 +23,8 @@ export default {
         stone: "#8A8798",
       },
       fontFamily: {
-        display: ["Zen Maru Gothic", "Noto Serif JP", "serif"],
-        body: ["Noto Serif JP", "Zen Maru Gothic", "system-ui", "sans-serif"],
+        display: ["SimSun", "宋体", "Songti SC", "STSong", "serif"],
+        body: ["SimSun", "宋体", "Songti SC", "STSong", "serif"],
       },
       boxShadow: {
         soft: "0 8px 32px rgba(46, 38, 88, 0.08)",

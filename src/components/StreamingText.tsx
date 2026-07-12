@@ -56,6 +56,9 @@ function parseMarkdown(text: string): ParsedBlock[] {
       flushParagraph();
       const itemContent = trimmed.replace(/^[-*]\s+/, "").replace(/^\d+\.\s+/, "");
       currentList.push(itemContent);
+    } else if (/^第[一二三四五六七八九十百零\d]+集/.test(trimmed)) {
+      flushParagraph();
+      currentList.push(trimmed);
     } else {
       flushList();
       currentParagraph.push(trimmed);

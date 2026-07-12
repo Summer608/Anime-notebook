@@ -153,7 +153,7 @@ export function StreamingText({ stream, onDone }: StreamingTextProps) {
 
   useEffect(() => {
     if (containerRef.current) {
-      containerRef.current.scrollTop = containerRef.current.scrollHeight;
+      containerRef.current.scrollIntoView({ block: "end" });
     }
   }, [text]);
 
@@ -169,7 +169,7 @@ export function StreamingText({ stream, onDone }: StreamingTextProps) {
   return (
     <div
       ref={containerRef}
-      className="max-h-[50vh] space-y-3 overflow-y-auto rounded-2xl bg-white/60 p-5 text-sm leading-relaxed text-ink/80 md:max-h-[60vh]"
+      className="space-y-3 text-sm leading-relaxed text-ink/80"
     >
       {error && text.length === 0 && (
         <p className="text-center text-coral">

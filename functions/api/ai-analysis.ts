@@ -102,7 +102,6 @@ export const onRequest: PagesFunction<Env> = async (context) => {
           stream: true,
           store: false,
           temperature: 0.15,
-          thinking: { type: "auto" },
           tools: [{ type: "web_search", max_keyword: 3 }],
         }),
         signal: AbortSignal.timeout(120000),

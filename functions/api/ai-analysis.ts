@@ -21,7 +21,7 @@ function buildPrompt(animeName: string): string {
 - **Bangumi 评分**：X.X / 10
 > ⚠️ 评分准确性最重要！请务必检索真实的豆瓣(douban.com)和Bangumi(bgm.tv)评分数据，切勿编造。如确实无法检索到，标注"暂无"。
 
-##  经典台词与名场面
+## 💬 经典台词与名场面
 1. "台词原文" —— 场景描述
 2. "台词原文" —— 场景描述
 ...（3-5 条，确保台词准确出自该作品）
@@ -46,11 +46,9 @@ xxx
 ...（3-5 条，确保信息准确真实）`;
 }
 
-interface DoubaoChunk {
-  choices: Array<{
-    delta?: { content?: string };
-    finish_reason?: string | null;
-  }>;
+interface ResponseEvent {
+  type: string;
+  delta?: string;
 }
 
 export const onRequest: PagesFunction<Env> = async (context) => {
@@ -88,7 +86,7 @@ export const onRequest: PagesFunction<Env> = async (context) => {
 
   try {
     const apiResponse = await fetch(
-      "https://ark.cn-beijing.volces.com/api/v3/chat/completions",
+      "https://ark.cn-beijing.volces.com/api/v3/responses",
       {
         method: "POST",
         headers: {
@@ -97,12 +95,13 @@ export const onRequest: PagesFunction<Env> = async (context) => {
         },
         body: JSON.stringify({
           model: "doubao-seed-2-0-mini-260428",
-          messages: [
+          input: [
             { role: "system", content: "你是一位资深动漫评论家，知识渊博，文笔生动。你提供的所有信息必须准确无误，尤其是评分数据必须来自真实检索结果，绝不能编造。" },
             { role: "user", content: buildPrompt(animeName) },
           ],
           stream: true,
-          temperature: 0.7,
+          store: false,
+          tools: [{ type: "web_search", max_keyword: 3 }],
         }),
         signal: AbortSignal.timeout(120000),
       },
@@ -120,6 +119,20 @@ export const onRequest: PagesFunction<Env> = async (context) => {
     const encoder = new TextEncoder();
     let buffer = "";
     let fullContent = "";
+    let closed = false;
+
+    const finishAndClose = async (controller: ReadableStreamDefaultController) => {
+      if (closed) return;
+      closed = true;
+      if (fullContent.length > 0) {
+        try {
+          await env.COVERS.put(cacheKey, fullContent);
+        } catch {
+          // 缓存写入失败不影响返回
+        }
+      }
+      controller.close();
+    };
 
     const stream = new ReadableStream({
       async start(controller) {
@@ -128,14 +141,7 @@ export const onRequest: PagesFunction<Env> = async (context) => {
             const { done, value } = await reader.read();
 
             if (done) {
-              if (fullContent.length > 0) {
-                try {
-                  await env.COVERS.put(cacheKey, fullContent);
-                } catch {
-                  // 缓存写入失败不影响返回
-                }
-              }
-              controller.close();
+              await finishAndClose(controller);
               return;
             }
 
@@ -149,31 +155,31 @@ export const onRequest: PagesFunction<Env> = async (context) => {
 
               const data = trimmed.slice(5).trim();
               if (data === "[DONE]") {
-                if (fullContent.length > 0) {
-                  try {
-                    await env.COVERS.put(cacheKey, fullContent);
-                  } catch {
-                    // 缓存写入失败不影响返回
-                  }
-                }
-                controller.close();
+                await finishAndClose(controller);
                 return;
               }
 
               try {
-                const parsed: DoubaoChunk = JSON.parse(data);
-                const delta = parsed.choices?.[0]?.delta?.content;
-                if (delta) {
-                  fullContent += delta;
-                  controller.enqueue(encoder.encode(delta));
+                const parsed: ResponseEvent = JSON.parse(data);
+
+                if (parsed.type === "response.output_text.delta" && parsed.delta) {
+                  fullContent += parsed.delta;
+                  controller.enqueue(encoder.encode(parsed.delta));
+                }
+
+                if (parsed.type === "response.completed") {
+                  await finishAndClose(controller);
+                  return;
                 }
               } catch {
-                // 跳过无法解析的行
+                // 跳过无法解析的行（event: 行、心跳行等）
               }
             }
           }
         } catch (err) {
-          controller.error(err);
+          if (!closed) {
+            controller.error(err);
+          }
         }
       },
       cancel() {

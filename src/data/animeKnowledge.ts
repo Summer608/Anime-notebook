@@ -1056,5 +1056,5 @@ export function findExactAnime(query: string): AnimeKnowledge | undefined {
 }
 
 export function generateDoubanUrl(title: string): string {
-  return `https://www.douban.com/search?q=${encodeURIComponent(title)}`;
+  return `https://www.douban.com/search?cat=1002&q=${encodeURIComponent(title)}`;
 }

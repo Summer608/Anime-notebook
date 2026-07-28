@@ -311,4 +311,20 @@ export const userAddedAnime: AnimeKnowledge[] = [
     fullName: "无职转生～到了异世界就拿出真本事～ 第2季part2",
     genres: ["异世界", "恋爱", "奇幻", "战斗", "冒险"],
   },
+  {
+    aliases: ["青春纪行"],
+    fullName: "青春纪行 / ゴールデンタイム",
+    genres: ["恋爱", "校园", "日常", "奇幻", "治愈"],
+  },
+  {
+    aliases: ["我心里危险的东西"],
+    fullName: "我心里危险的东西 / 僕の心のヤバイやつ",
+    genres: ["恋爱", "校园", "日常", "搞笑", "治愈"],
+  },
+  {
+    aliases: ["弹丸论破"],
+    fullName: "弹丸论破 希望学园与绝望高中生 / ダンガンロンパ 希望の学園と絶望の高校生 THE ANIMATION",
+    genres: ["推理", "悬疑", "校园", "恐怖", "奇幻"],
+  },
+
 ];

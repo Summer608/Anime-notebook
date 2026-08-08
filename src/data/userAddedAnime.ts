@@ -135,6 +135,7 @@ export const userAddedAnime: AnimeKnowledge[] = [
     aliases: ["弱势角色友崎君", "友崎君"],
     fullName: "弱势角色友崎君 / 弱キャラ友崎くん",
     genres: ["校园", "恋爱", "日常", "搞笑"],
+    seasons: [1, 2],
   },
   {
     aliases: ["我推的孩子", "Oshi no Ko"],
@@ -320,11 +321,22 @@ export const userAddedAnime: AnimeKnowledge[] = [
     aliases: ["我心里危险的东西"],
     fullName: "我心里危险的东西 / 僕の心のヤバイやつ",
     genres: ["恋爱", "校园", "日常", "搞笑", "治愈"],
+    seasons: [1, 2],
   },
   {
     aliases: ["弹丸论破"],
     fullName: "弹丸论破 希望学园与绝望高中生 / ダンガンロンパ 希望の学園と絶望の高校生 THE ANIMATION",
     genres: ["推理", "悬疑", "校园", "恐怖", "奇幻"],
+  },
+  {
+    aliases: ["俺物语", "俺物语！！", "ore monogatari"],
+    fullName: "俺物语！！ / 俺物語！！",
+    genres: ["恋爱", "校园", "搞笑", "治愈", "日常"],
+  },
+  {
+    aliases: ["恋如雨止", "恋如雨"],
+    fullName: "恋如雨止 / 恋は雨上がりのように",
+    genres: ["恋爱", "日常", "治愈", "职场"],
   },
 
 ];

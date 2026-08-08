@@ -331,12 +331,12 @@ export const userAddedAnime: AnimeKnowledge[] = [
   {
     aliases: ["俺物语", "俺物语！！", "ore monogatari"],
     fullName: "俺物语！！ / 俺物語！！",
-    genres: ["恋爱", "校园", "搞笑", "治愈", "日常"],
+    genres: ["恋爱", "搞笑", "校园", "日常", "治愈"],
   },
   {
     aliases: ["恋如雨止", "恋如雨"],
     fullName: "恋如雨止 / 恋は雨上がりのように",
-    genres: ["恋爱", "日常", "治愈", "职场"],
+    genres: ["恋爱", "校园", "治愈", "职场", "日常"],
   },
 
 ];

@@ -439,6 +439,11 @@ export const animeKnowledgeBase: AnimeKnowledge[] = [
     aliases: ["来自深渊"],
     fullName: "来自深渊 / メイドインアビス",
     genres: ["奇幻", "冒险", "恐怖", "治愈", "战斗"],
+    seasons: [1, 2, 3],
+    namedSeasons: {
+      2: "来自深渊 深沉灵魂的黎明",
+      3: "来自深渊 烈日的黄金乡",
+    },
   },
   {
     aliases: ["魔法少女小圆", "小圆"],

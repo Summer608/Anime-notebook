@@ -23,4 +23,5 @@ jobs:
             echo "Supabase API 请求成功，项目保持活跃。"
           else
             echo "Supabase 返回 $response，项目可能已暂停或出错，请检查。"
+            exit 1
           fi

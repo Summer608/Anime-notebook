@@ -470,6 +470,11 @@ export const animeKnowledgeBase: AnimeKnowledge[] = [
     genres: ["校园", "搞笑", "日常", "奇幻", "科幻"],
   },
   {
+    aliases: ["凉宫春日的消失"],
+    fullName: "凉宫春日的消失 / 涼宮ハルヒの消失",
+    genres: ["校园", "科幻", "奇幻", "恋爱"],
+  },
+  {
     aliases: ["Re从零开始的异世界生活", "Re0"],
     fullName: "Re：从零开始的异世界生活 / Re:ゼロから始める異世界生活",
     genres: ["异世界", "奇幻", "战斗", "恋爱", "冒险"],

@@ -460,8 +460,8 @@ export const animeKnowledgeBase: AnimeKnowledge[] = [
     genres: ["奇幻", "战斗", "恋爱"],
   },
   {
-    aliases: ["物语系列", "化物语"],
-    fullName: "物语系列 / 〈物語〉シリーズ",
+    aliases: ["化物语", "物语系列"],
+    fullName: "化物语 / 化物語",
     genres: ["恋爱", "奇幻", "校园", "搞笑", "日常"],
   },
   {

@@ -2,8 +2,9 @@ name: Keep Supabase Alive
 
 on:
   schedule:
-    # 每3天 UTC 02:00（北京时间 10:00）执行一次
-    - cron: '0 2 */3 * *'
+    # 每6小时执行一次（每天4次，即 UTC 0/6/12/18 点）
+    # Supabase 要求"过去一周每天有几次请求"才算足够活跃，每3天1次远不够
+    - cron: '0 */6 * * *'
   workflow_dispatch:
 
 jobs:

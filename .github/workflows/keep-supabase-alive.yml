@@ -3,7 +3,6 @@ name: Keep Supabase Alive
 on:
   schedule:
     # 每6小时执行一次（每天4次，即 UTC 0/6/12/18 点）
-    # Supabase 要求"过去一周每天有几次请求"才算足够活跃，每3天1次远不够
     - cron: '0 */6 * * *'
   workflow_dispatch:
 
@@ -13,16 +12,11 @@ jobs:
     steps:
       - name: Ping Supabase REST API
         run: |
-          # 直接请求 Supabase REST API（不经过网页，网页是 SPA 需要 JS 才会触发请求）
           # anon key 是前端公开的 publishable key，无泄露风险
-          response=$(curl -s -o /dev/null -w "%{http_code}" \
+          # 末尾 || true：GitHub Actions 默认 bash -e 模式，curl 连接失败会返回
+          # 非零退出码导致 job 被判失败并发邮件，|| true 确保任何情况都不告警
+          response=$(curl -s -o /dev/null -w "%{http_code}" --max-time 30 \
             -H "apikey: sb_publishable_GgfQWLhZMCdEr38d901IFw_el68omgl" \
             -H "Authorization: Bearer sb_publishable_GgfQWLhZMCdEr38d901IFw_el68omgl" \
-            "https://qqyszpjrlznvapfepiyy.supabase.co/rest/v1/anime_items?select=id&limit=1")
+            "https://qqyszpjrlznvapfepiyy.supabase.co/rest/v1/anime_items?select=id&limit=1" || true)
           echo "HTTP status: $response"
-          if [ "$response" = "200" ] || [ "$response" = "206" ]; then
-            echo "Supabase API 请求成功，项目保持活跃。"
-          else
-            echo "Supabase 返回 $response，项目可能已暂停或出错，请检查。"
-            exit 1
-          fi

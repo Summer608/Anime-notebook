@@ -484,6 +484,7 @@ export const animeKnowledgeBase: AnimeKnowledge[] = [
       { suffix: "第三季前半", label: "第三季 前半" },
       { suffix: "第三季反击篇", label: "第三季 反击篇" },
       { suffix: "第四季", label: "第四季" },
+      { suffix: "第四季夺还篇", label: "第四季 夺还篇" },
     ],
     ovas: true,
   },

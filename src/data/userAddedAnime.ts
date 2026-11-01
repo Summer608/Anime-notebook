@@ -338,5 +338,27 @@ export const userAddedAnime: AnimeKnowledge[] = [
     fullName: "恋如雨止 / 恋は雨上がりのように",
     genres: ["恋爱", "校园", "治愈", "职场", "日常"],
   },
+  {
+    aliases: ["夏日口袋", "Summer Pockets"],
+    fullName: "夏日口袋 / サマーポケッツ",
+    genres: ["恋爱", "治愈", "日常", "校园", "奇幻"],
+  },
+  {
+    aliases: ["Just Because", "just because"],
+    fullName: "Just Because!",
+    genres: ["恋爱", "校园", "日常", "治愈"],
+  },
+  {
+    aliases: ["恋爱随意链", "Kokoro Connect", "心连心", "心连情结"],
+    fullName: "恋爱随意链接 / ココロコネクト",
+    genres: ["恋爱", "校园", "奇幻", "日常", "搞笑"],
+  },
+  {
+    aliases: ["高分少女", "Hi Score Girl"],
+    fullName: "高分少女 / ハイスコアガール",
+    genres: ["恋爱", "校园", "搞笑", "日常"],
+    namedSeasons: [{ suffix: "II", label: "II" }],
+    ovas: true,
+  },
 
 ];

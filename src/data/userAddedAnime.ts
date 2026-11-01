@@ -341,7 +341,7 @@ export const userAddedAnime: AnimeKnowledge[] = [
   {
     aliases: ["夏日口袋", "Summer Pockets"],
     fullName: "夏日口袋 / サマーポケッツ",
-    genres: ["恋爱", "治愈", "日常", "校园", "奇幻"],
+    genres: ["恋爱", "治愈", "日常", "奇幻"],
   },
   {
     aliases: ["Just Because", "just because"],
@@ -351,7 +351,7 @@ export const userAddedAnime: AnimeKnowledge[] = [
   {
     aliases: ["恋爱随意链", "Kokoro Connect", "心连心", "心连情结"],
     fullName: "恋爱随意链接 / ココロコネクト",
-    genres: ["恋爱", "校园", "奇幻", "日常", "搞笑"],
+    genres: ["恋爱", "校园", "奇幻", "日常", "治愈"],
   },
   {
     aliases: ["高分少女", "Hi Score Girl"],
